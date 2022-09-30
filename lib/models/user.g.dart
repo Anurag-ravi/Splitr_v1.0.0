@@ -18,23 +18,26 @@ class UserAdapter extends TypeAdapter<User> {
     };
     return User(
       uuid: fields[0] as String,
-      name: fields[1] as String,
-      paid: fields[2] as double,
-      expense: fields[3] as double,
+      tripid: fields[1] as String,
+      name: fields[2] as String,
+      paid: fields[3] as double,
+      expense: fields[4] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, User obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.uuid)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.tripid)
       ..writeByte(2)
-      ..write(obj.paid)
+      ..write(obj.name)
       ..writeByte(3)
+      ..write(obj.paid)
+      ..writeByte(4)
       ..write(obj.expense);
   }
 

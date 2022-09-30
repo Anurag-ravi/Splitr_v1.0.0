@@ -18,26 +18,29 @@ class PaymentAdapter extends TypeAdapter<Payment> {
     };
     return Payment(
       uuid: fields[0] as String,
-      from: fields[1] as String,
-      to: fields[2] as String,
-      amount: fields[3] as double,
-      date: fields[4] as DateTime,
+      tripid: fields[1] as String,
+      from: fields[2] as String,
+      to: fields[3] as String,
+      amount: fields[4] as double,
+      date: fields[5] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, Payment obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.uuid)
       ..writeByte(1)
-      ..write(obj.from)
+      ..write(obj.tripid)
       ..writeByte(2)
-      ..write(obj.to)
+      ..write(obj.from)
       ..writeByte(3)
-      ..write(obj.amount)
+      ..write(obj.to)
       ..writeByte(4)
+      ..write(obj.amount)
+      ..writeByte(5)
       ..write(obj.date);
   }
 

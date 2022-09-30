@@ -8,19 +8,23 @@ class Payment extends HiveObject {
   final String uuid;
 
   @HiveField(1)
-  final String from;
+  final String tripid;
 
   @HiveField(2)
-  final String to;
+  final String from;
 
   @HiveField(3)
-  final double amount;
+  final String to;
 
   @HiveField(4)
+  final double amount;
+
+  @HiveField(5)
   final DateTime date;
 
   Payment(
       {required this.uuid,
+      required this.tripid,
       required this.from,
       required this.to,
       required this.amount,

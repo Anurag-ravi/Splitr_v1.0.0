@@ -18,29 +18,32 @@ class ExpenseAdapter extends TypeAdapter<Expense> {
     };
     return Expense(
       uuid: fields[0] as String,
-      name: fields[1] as String,
-      amount: fields[2] as double,
-      by: (fields[3] as List).cast<Pay>(),
-      to: (fields[4] as List).cast<Pay>(),
-      date: fields[5] as DateTime,
+      tripid: fields[1] as String,
+      name: fields[2] as String,
+      amount: fields[3] as double,
+      by: (fields[4] as List).cast<Pay>(),
+      to: (fields[5] as List).cast<Pay>(),
+      date: fields[6] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, Expense obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.uuid)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.tripid)
       ..writeByte(2)
-      ..write(obj.amount)
+      ..write(obj.name)
       ..writeByte(3)
-      ..write(obj.by)
+      ..write(obj.amount)
       ..writeByte(4)
-      ..write(obj.to)
+      ..write(obj.by)
       ..writeByte(5)
+      ..write(obj.to)
+      ..writeByte(6)
       ..write(obj.date);
   }
 

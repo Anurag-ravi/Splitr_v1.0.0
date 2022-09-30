@@ -111,9 +111,6 @@ class _HomePageState extends State<HomePage> {
                                               onPressed: () async {
                                                 final trip = Trip(uuid: Uuid().v1(), name: tripName, currency: "INR");
                                                 Boxes.getTrips().add(trip);
-                                                await Hive.openBox(trip.uuid+"u");
-                                                await Hive.openBox(trip.uuid+"e");
-                                                await Hive.openBox(trip.uuid+"p");
                                                 setState(() {
                                                   hasTrip = true;
                                                   this.trip = trip;
@@ -156,6 +153,7 @@ class _HomePageState extends State<HomePage> {
                           currIndex = index;
                           trip = tripp;
                         });
+                        Navigator.pop(context);
                       },
                       child: Container(
                         color: currIndex==index ? getPrimary(context) : Colors.transparent,

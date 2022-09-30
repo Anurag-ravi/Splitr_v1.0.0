@@ -22,13 +22,11 @@ Future main() async {
   Hive.registerAdapter(ExpenseAdapter());
   Hive.registerAdapter(PaymentAdapter());
   Hive.registerAdapter(TripAdapter());
-  var trips = await Hive.openBox<Trip>('trips');
-  var t = trips.values.toList().cast<Trip>();
-  for(int i=0;i<t.length;i++){
-    await Hive.openBox<User>(t[i].uuid + "u");
-    await Hive.openBox<Expense>(t[i].uuid + "e");
-    await Hive.openBox<Payment>(t[i].uuid + "p");
-  }
+  await Hive.openBox<Trip>('trips');
+  await Hive.openBox<User>('users');
+  await Hive.openBox<Expense>('expenses');
+  await Hive.openBox<Payment>('payments');
+  await Hive.openBox<Pay>('pays');
 
   runApp(const MyApp());
 }
@@ -43,7 +41,7 @@ class MyApp extends StatelessWidget {
       child: Consumer(
         builder: (context,ThemeModel themenotifier,child){
           return MaterialApp(
-          title: 'Clans',
+          title: 'Splitr',
           theme: ThemeData(
             fontFamily: 'Poppins',
             brightness: Brightness.light,

@@ -18,17 +18,23 @@ class PayAdapter extends TypeAdapter<Pay> {
     };
     return Pay(
       uuid: fields[0] as String,
-      amount: fields[1] as double,
+      expenseid: fields[1] as String,
+      isBy: fields[2] as bool,
+      amount: fields[3] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, Pay obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.uuid)
       ..writeByte(1)
+      ..write(obj.expenseid)
+      ..writeByte(2)
+      ..write(obj.isBy)
+      ..writeByte(3)
       ..write(obj.amount);
   }
 

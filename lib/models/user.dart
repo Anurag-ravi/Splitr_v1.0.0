@@ -8,16 +8,20 @@ class User extends HiveObject {
   final String uuid;
 
   @HiveField(1)
-  final String name;
+  final String tripid;
 
   @HiveField(2)
-  final double paid;
+  final String name;
 
   @HiveField(3)
+  final double paid;
+
+  @HiveField(4)
   final double expense;
 
   User(
       {required this.uuid,
+      required this.tripid,
       required this.name,
       this.paid = 0,
       this.expense = 0});

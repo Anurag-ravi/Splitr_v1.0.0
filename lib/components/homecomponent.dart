@@ -7,6 +7,7 @@ import 'package:splitr/models/expense.dart';
 import 'package:splitr/models/payment.dart';
 import 'package:splitr/models/trip.dart';
 import 'package:splitr/models/user.dart';
+import 'package:splitr/pages/expenseadd.dart';
 import 'package:splitr/utilities/boxes.dart';
 import 'package:splitr/utilities/colors.dart';
 import 'package:uuid/uuid.dart';
@@ -40,7 +41,7 @@ class _HomeComponentState extends State<HomeComponent> {
       body: Container(
         padding: EdgeInsets.all(20),
         child: ValueListenableBuilder<Box<User>>(
-          valueListenable: Boxes.getUsers(widget.trip.uuid).listenable(),
+          valueListenable: Boxes.getUsers().listenable(),
           builder: (context, box, child) {
             List<User> users = box.values.toList().cast<User>();
             return ListView.builder(
@@ -48,8 +49,11 @@ class _HomeComponentState extends State<HomeComponent> {
               itemBuilder: (context, index) {
                 var user = users[index];
                 double net = user.paid-user.expense;
-                return Container(
-                  padding: EdgeInsets.all(10),
+                return user.tripid == widget.trip.uuid ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200]
+                  ),
+                  padding: EdgeInsets.all(15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -57,7 +61,7 @@ class _HomeComponentState extends State<HomeComponent> {
                       Text(net.toString()),
                     ],
                   ),
-                );
+                ):Container();
               }
               );
           },
@@ -76,7 +80,8 @@ class _HomeComponentState extends State<HomeComponent> {
                 children: [
                   GestureDetector(                    
                     onTap: () {
-                      
+                      Navigator.pop(context);
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ExpenseAdd(trip: widget.trip,)));
                     },
                     child: Container(
                       padding: EdgeInsets.all(2),
@@ -127,8 +132,8 @@ class _HomeComponentState extends State<HomeComponent> {
                             ),
                             TextButton(
                               onPressed: () {
-                                final userr = User(uuid: Uuid().v1(), name: user);
-                                Boxes.getUsers(widget.trip.uuid+'u').add(userr);
+                                final userr = User(uuid: Uuid().v1(), name: user,tripid: widget.trip.uuid);
+                                Boxes.getUsers().add(userr);
                                 setState(() {
                                   user="";
                                 });

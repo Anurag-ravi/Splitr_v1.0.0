@@ -9,22 +9,26 @@ class Expense extends HiveObject {
   final String uuid;
 
   @HiveField(1)
-  final String name;
+  final String tripid;
 
   @HiveField(2)
-  final double amount;
+  final String name;
 
   @HiveField(3)
-  final List<Pay> by;
+  final double amount;
 
   @HiveField(4)
-  final List<Pay> to;
+  final List<Pay> by;
 
   @HiveField(5)
+  final List<Pay> to;
+
+  @HiveField(6)
   final DateTime date;
 
   Expense(
       {required this.uuid,
+      required this.tripid,
       required this.name,
       required this.amount,
       required this.by,
