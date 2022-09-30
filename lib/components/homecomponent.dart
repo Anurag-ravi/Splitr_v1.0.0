@@ -22,16 +22,6 @@ class HomeComponent extends StatefulWidget {
 class _HomeComponentState extends State<HomeComponent> {
   String user = "";
 
-  @override
-  void initState() {
-    super.initState();
-    openBoxes();
-  }
-  Future<void> openBoxes() async {
-    if(Hive.box<User>(widget.trip.uuid+"u").isOpen == false) await Hive.openBox<User>(widget.trip.uuid + "u");
-    if(Hive.box<Expense>(widget.trip.uuid+"e").isOpen == false) await Hive.openBox<Expense>(widget.trip.uuid + "e");
-    if(Hive.box<Payment>(widget.trip.uuid+"p").isOpen == false) await Hive.openBox<Payment>(widget.trip.uuid + "p");
-  }
 
   @override
   Widget build(BuildContext context) {
