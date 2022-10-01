@@ -11,14 +11,14 @@ import 'package:splitr/utilities/boxes.dart';
 import 'package:splitr/utilities/calculate.dart';
 import 'package:uuid/uuid.dart';
 
-class ExpenseAdd extends StatefulWidget {
-  const ExpenseAdd({Key? key, required this.trip}) : super(key: key);
-  final Trip trip;
+class ExpenseUpdate extends StatefulWidget {
+  const ExpenseUpdate({Key? key, required this.expense}) : super(key: key);
+  final Expense expense;
   @override
-  State<ExpenseAdd> createState() => _ExpenseAddState();
+  State<ExpenseUpdate> createState() => _ExpenseUpdateState();
 }
 
-class _ExpenseAddState extends State<ExpenseAdd> {
+class _ExpenseUpdateState extends State<ExpenseUpdate> {
   String name = "";
   double amount = 0.0;
   DateTime dt = DateTime.now();
@@ -35,12 +35,31 @@ class _ExpenseAddState extends State<ExpenseAdd> {
     super.initState();
     List<User> list = Boxes.getUsers().values.toList().cast<User>();
     setState(() {
-      users = list.where((element) => element.tripid == widget.trip.uuid).toList();
+      name = widget.expense.name;
+      amount = widget.expense.amount;
+      dt = widget.expense.date;
+      dateinput.text = DateFormat.yMd().format(widget.expense.date);
+      users = list.where((element) => element.tripid == widget.expense.tripid).toList();
       bySelect = List.filled(users.length, false);
       toSelect = List.filled(users.length, true);
       contr = List.generate(users.length, (index) => TextEditingController());
       contr2 = List.generate(users.length, (index) => TextEditingController());
-      num2 = users.length;
+      for(int i=0;i<users.length;i++){
+        for(var by in widget.expense.by){
+          if(by.uuid == users[i].uuid){
+            bySelect[i] = true;
+            num++;
+            contr[i].text = by.amount.toString();
+          }
+        }
+        for(var to in widget.expense.to){
+          if(to.uuid == users[i].uuid){
+            toSelect[i] = true;
+            num2++;
+            contr2[i].text = to.amount.toString();
+          }
+        }
+      }
     });
   }
 
@@ -48,9 +67,10 @@ class _ExpenseAddState extends State<ExpenseAdd> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Expense"),
+        title: Text("Update Expense"),
         actions: [
-          IconButton(onPressed: () {
+          IconButton(
+            onPressed: () {
             double spent=0,paid=0;
             for(int i=0;i<users.length;i++){
               if(bySelect[i]){ paid+=double.parse(contr[i].text);}
@@ -60,23 +80,18 @@ class _ExpenseAddState extends State<ExpenseAdd> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all the fields")));
             }
             else if((amount-spent).abs() <= 0.01 && (amount-paid).abs() <= 0.01 && amount >= 0.0){
-              var box = Boxes.getExpenses();
-              var uuid = Uuid().v1();
               List<Pay> by = [],to = [];
               for(int i=0;i<users.length;i++){
-                if(bySelect[i]){ by.add(Pay(uuid: users[i].uuid,amount: double.parse(contr[i].text),isBy:true,expenseid: uuid));}
-                if(toSelect[i]){ to.add(Pay(uuid: users[i].uuid,amount: double.parse(contr2[i].text),isBy: false,expenseid: uuid));}
+                if(bySelect[i]){ by.add(Pay(uuid: users[i].uuid,amount: double.parse(contr[i].text),isBy:true,expenseid: widget.expense.uuid));}
+                if(toSelect[i]){ to.add(Pay(uuid: users[i].uuid,amount: double.parse(contr2[i].text),isBy: false,expenseid: widget.expense.uuid));}
               }
-              box.put(uuid, Expense(
-                uuid: uuid,
-                name: name,
-                amount: amount,
-                date: dt,
-                tripid: widget.trip.uuid,
-                by: by,
-                to: to,
-              ));
-              calculateForUser(widget.trip.uuid);
+              widget.expense.name = name;
+              widget.expense.amount = amount;
+              widget.expense.date = dt;
+              widget.expense.by = by;
+              widget.expense.to = to;
+              widget.expense.save();
+              calculateForUser(widget.expense.tripid);
               Navigator.pop(context);
             } else {
               showDialog(
@@ -103,18 +118,19 @@ class _ExpenseAddState extends State<ExpenseAdd> {
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: ListView(children: [
-          TextField(
+          TextFormField(
             decoration: InputDecoration(hintText: "Enter Expense Name"),
             onChanged: (value) {
               setState(() {
                 name = value;
               });
             },
+            initialValue: widget.expense.name,
           ),
           SizedBox(
             height: 30,
           ),
-          TextField(
+          TextFormField(
             decoration: InputDecoration(hintText: "Enter Amount"),
             onChanged: (value) {
               setState(() {
@@ -125,12 +141,13 @@ class _ExpenseAddState extends State<ExpenseAdd> {
                 }
               });
             },
+            initialValue: widget.expense.amount.toString(),
             keyboardType: TextInputType.number,
           ),
           SizedBox(
             height: 30,
           ),
-          TextField(
+          TextFormField(
             controller: dateinput, //editing controller of this TextField
             decoration: InputDecoration( 
                 icon: Icon(Icons.calendar_today), //icon of text field
@@ -192,7 +209,7 @@ class _ExpenseAddState extends State<ExpenseAdd> {
                       Expanded(child: Text(users[index].name),flex: 5,),
                       Expanded(
                         flex: 3,
-                        child: bySelect[index] ? TextField(
+                        child: bySelect[index] ? TextFormField(
                           controller: contr[index],
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(0),
@@ -257,6 +274,44 @@ class _ExpenseAddState extends State<ExpenseAdd> {
                   ),
                 );
               }),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.red)
+                    ),
+                    child: Text("Delete"),
+                    onPressed: () {
+                      showDialog(
+                        context: context, 
+                        builder: (context) => AlertDialog(
+                          title: Text("Delete Expense"),
+                          content: Text("Are you sure you want to delete this expense - ${widget.expense.name}?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              }, 
+                              child: Text("Cancel")
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                var tripid = widget.expense.tripid;
+                                Boxes.getExpenses().delete(widget.expense.uuid);
+                                calculateForUser(tripid);
+                                Navigator.of(context).pop();
+                              }, 
+                              child: Text("Delete")
+                            ),
+                          ],
+                        )
+                        );
+                    },
+                  ),
+                ),
+              )
         ]),
       ),
     );

@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:splitr/components/expensecomponent.dart';
 import 'package:splitr/components/homecomponent.dart';
+import 'package:splitr/components/paymentcomponent.dart';
 import 'package:splitr/models/trip.dart';
 import 'package:splitr/utilities/boxes.dart';
 import 'package:splitr/utilities/colors.dart';
@@ -16,12 +18,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
   bool isEdit = false;
   int currIndex = 1;
   String tripName = "";
   late Trip trip;
   bool hasTrip = false;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _HomePageState extends State<HomePage> {
         trip = trips[0];
       });
     }
+    _tabController = TabController(length: 3, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -109,18 +113,23 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             TextButton(
                                               onPressed: () async {
-                                                final trip = Trip(uuid: Uuid().v1(), name: tripName, currency: "INR");
-                                                Boxes.getTrips().add(trip);
-                                                setState(() {
-                                                  hasTrip = true;
-                                                  this.trip = trip;
-                                                });
-                                                if(Boxes.getTrips().values.toList().cast<Trip>().length != 1){
+                                                if(tripName != ""){
+                                                  var uuid = Uuid().v1();
+                                                  final trip = Trip(uuid: uuid, name: tripName, currency: "INR");
+                                                  Boxes.getTrips().put(uuid,trip);
                                                   setState(() {
-                                                    currIndex = currIndex + 1;
+                                                    hasTrip = true;
+                                                    this.trip = trip;
                                                   });
+                                                  if(Boxes.getTrips().values.toList().cast<Trip>().length != 1){
+                                                    setState(() {
+                                                      currIndex = currIndex + 1;
+                                                    });
+                                                  }
+                                                  Navigator.of(context).pop();
+                                                } else {
+                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a trip name")));
                                                 }
-                                                Navigator.of(context).pop();
                                               }, 
                                               child: Text("Add")
                                             )
@@ -147,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
                     var tripp = trips[index-1];
-                    return GestureDetector(
+                    return InkWell(
                       onTap: () {
                         setState(() {
                           currIndex = index;
@@ -165,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                               tripp.name,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(fontSize: deviceWidth*0.06),),
-                            isEdit ? GestureDetector(
+                            isEdit ? InkWell(
                               child: Icon(Icons.delete),
                               onTap: () {
                                 showDialog(
@@ -229,8 +238,31 @@ class _HomePageState extends State<HomePage> {
       ),
       appBar: AppBar(
         title: Text(hasTrip ? trip.name : "Splitr"),
+        bottom: hasTrip ? TabBar(
+          controller: _tabController,
+          tabs: const <Widget>[
+            Tab(
+              text: "Overview",
+            ),
+            Tab(
+              text: "Expenses",
+            ),
+            Tab(
+              text: "Payments",
+            ),
+          ],
+        ) : null,
       ),
-      body: hasTrip ? HomeComponent(trip: trip) : Center(
+      body: hasTrip ? 
+      TabBarView(
+        controller: _tabController,
+        children: [
+          HomeComponent(trip: trip),
+          ExpenseComponent(trip: trip),
+          PaymentComponent(trip: trip),
+        ]
+        )
+       : Center(
         child: Text("Create a bill to Split"),
       ),
     );

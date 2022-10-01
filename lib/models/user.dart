@@ -11,13 +11,13 @@ class User extends HiveObject {
   final String tripid;
 
   @HiveField(2)
-  final String name;
+   String name;
 
   @HiveField(3)
-  final double paid;
+   double paid;
 
   @HiveField(4)
-  final double expense;
+   double expense;
 
   User(
       {required this.uuid,

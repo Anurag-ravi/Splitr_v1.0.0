@@ -8,6 +8,7 @@ import 'package:splitr/models/payment.dart';
 import 'package:splitr/models/trip.dart';
 import 'package:splitr/models/user.dart';
 import 'package:splitr/pages/expenseadd.dart';
+import 'package:splitr/pages/paymentadd.dart';
 import 'package:splitr/utilities/boxes.dart';
 import 'package:splitr/utilities/colors.dart';
 import 'package:uuid/uuid.dart';
@@ -68,7 +69,7 @@ class _HomeComponentState extends State<HomeComponent> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  GestureDetector(                    
+                  InkWell(                    
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ExpenseAdd(trip: widget.trip,)));
@@ -85,18 +86,24 @@ class _HomeComponentState extends State<HomeComponent> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.all(2),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(Icons.monetization_on_outlined,size: 40,),
-                        SizedBox(width: 10,),
-                        Text('Add Payment'),
-                      ],
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>PaymentAdd(trip: widget.trip,)));
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(Icons.monetization_on_outlined,size: 40,),
+                          SizedBox(width: 10,),
+                          Text('Add Payment'),
+                        ],
+                      ),
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       Navigator.pop(context);
                       showDialog(
@@ -122,12 +129,17 @@ class _HomeComponentState extends State<HomeComponent> {
                             ),
                             TextButton(
                               onPressed: () {
-                                final userr = User(uuid: Uuid().v1(), name: user,tripid: widget.trip.uuid);
-                                Boxes.getUsers().add(userr);
-                                setState(() {
-                                  user="";
-                                });
-                                Navigator.of(context).pop();
+                                if(user != ""){
+                                  var uuid = Uuid().v1();
+                                  final userr = User(uuid: uuid, name: user,tripid: widget.trip.uuid);
+                                  Boxes.getUsers().put(uuid,userr);
+                                  setState(() {
+                                    user="";
+                                  });
+                                  Navigator.of(context).pop();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please Enter Member Name")));
+                                }
                               }, 
                               child: Text("Add")
                             )
