@@ -6,7 +6,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:splitr/components/expensecomponent.dart';
 import 'package:splitr/components/homecomponent.dart';
 import 'package:splitr/components/paymentcomponent.dart';
+import 'package:splitr/models/expense.dart';
+import 'package:splitr/models/payment.dart';
 import 'package:splitr/models/trip.dart';
+import 'package:splitr/models/user.dart';
 import 'package:splitr/utilities/boxes.dart';
 import 'package:splitr/utilities/colors.dart';
 import 'package:uuid/uuid.dart';
@@ -64,8 +67,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
                   itemBuilder: (context, index) {
                     if(index == 0){
                       return Container(
-                        height: deviceWidth*0.2,
-                        padding: EdgeInsets.all(10),
+                        height: deviceWidth*0.25,
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                         decoration: BoxDecoration(
                           color: getPrimary(context),
                           border: Border(
@@ -81,13 +84,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
                             children: [
                               Text(
                                 "Trips",
-                                style: TextStyle(fontSize: deviceWidth * 0.07),
+                                style: TextStyle(fontSize: deviceWidth * 0.09, color: Colors.white),
                               ),
                               Row(
                                 children: [
                                   IconButton(
                                     icon: Icon(
                                       Icons.add
+                                      ,color: Colors.white,
                                       ),
                                     onPressed: () {
                                       showDialog(
@@ -140,7 +144,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
                                   ),
                                   IconButton(
                                     icon: Icon(
-                                      isEdit ? Icons.check_rounded : Icons.edit
+                                      isEdit ? Icons.check_rounded : Icons.edit,
+                                      color: Colors.white,
                                       ),
                                     onPressed: () {
                                       setState(() {
@@ -165,7 +170,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
                         Navigator.pop(context);
                       },
                       child: Container(
-                        color: currIndex==index ? getPrimary(context) : Colors.transparent,
+                        color: currIndex==index ? Colors.grey[200]: Colors.transparent,
                         padding: EdgeInsets.all(15),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -192,6 +197,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
+                                          var expenses = Boxes.getExpenses().values.toList().cast<Expense>();
+                                          for(var expense in expenses){
+                                            if(expense.tripid == tripp.uuid){
+                                              Boxes.getExpenses().delete(expense.uuid);
+                                            }
+                                          }
+                                          var users = Boxes.getUsers().values.toList().cast<User>();
+                                          for(var user in users){
+                                            if(user.tripid == tripp.uuid){
+                                              Boxes.getUsers().delete(user.uuid);
+                                            }
+                                          }
+                                          var payments = Boxes.getPayments().values.toList().cast<Payment>();
+                                          for(var payment in payments){
+                                            if(payment.tripid == tripp.uuid){
+                                              Boxes.getPayments().delete(payment.uuid);
+                                            }
+                                          }
                                           tripp.delete();
                                           if(trips.length == 1){
                                             setState(() {
@@ -252,6 +275,60 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
             ),
           ],
         ) : null,
+        actions: [
+          PopupMenuButton<String>(
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(
+                    child: Text("Edit Trip"),
+                    value: "Edit Trip",
+                  ),
+                ];
+              },
+              onSelected: (value) {
+                if (value == "Edit Trip") {
+                  showDialog(
+                    context: context, 
+                    builder: (context)=> AlertDialog(
+                      title: Text("Edit Trip"),
+                      content: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Trip Name"
+                        ),
+                        initialValue: trip.name,
+                        onChanged: (value) {
+                          setState(() {
+                            tripName = value;
+                          });
+                        },
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          }, 
+                          child: Text("Cancel")
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            if(tripName != ""){
+                              trip.name = tripName;
+                              trip.save();
+                              Navigator.of(context).pop();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a trip name")));
+                            }
+                          }, 
+                          child: Text("Edit")
+                        )
+                      ],
+                    )
+                  );
+                }
+              },
+              elevation: 5.0,
+            ),
+        ],
       ),
       body: hasTrip ? 
       TabBarView(

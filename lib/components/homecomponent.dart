@@ -65,7 +65,7 @@ class _HomeComponentState extends State<HomeComponent> {
           builder: (context)=> AlertDialog(
             title: Text('Choose Action'),
             content: Container(
-              height: deviceHeight * 0.2,
+              height: deviceHeight * 0.25,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -75,11 +75,11 @@ class _HomeComponentState extends State<HomeComponent> {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ExpenseAdd(trip: widget.trip,)));
                     },
                     child: Container(
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Icon(Icons.money,size: 40,),
+                          Icon(Icons.money,size: 40,color: getPrimary(context),),
                           SizedBox(width: 10,),
                           Text('Add Expense'),
                         ],
@@ -92,11 +92,11 @@ class _HomeComponentState extends State<HomeComponent> {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context)=>PaymentAdd(trip: widget.trip,)));
                     },
                     child: Container(
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Icon(Icons.monetization_on_outlined,size: 40,),
+                          Icon(Icons.monetization_on_outlined,size: 40,color: getPrimary(context),),
                           SizedBox(width: 10,),
                           Text('Add Payment'),
                         ],
@@ -148,11 +148,11 @@ class _HomeComponentState extends State<HomeComponent> {
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Icon(Icons.person,size: 40,),
+                          Icon(Icons.person,size: 40,color: getPrimary(context),),
                           SizedBox(width: 10,),
                           Text('Add Member'),
                         ],

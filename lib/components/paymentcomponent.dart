@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:splitr/models/expense.dart';
 import 'package:splitr/models/payment.dart';
 import 'package:splitr/models/trip.dart';
+import 'package:splitr/pages/paymentupdate.dart';
 import 'package:splitr/utilities/boxes.dart';
 
 class PaymentComponent extends StatefulWidget {
@@ -33,24 +34,29 @@ class _PaymentComponentState extends State<PaymentComponent> {
                   String from = "", to = "";
                   from = Boxes.getUsers().get(payment.from)!.name;
                   to = Boxes.getUsers().get(payment.to)!.name;
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200]
-                    ),
-                    padding: EdgeInsets.all(15),
-                    margin: EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("From : " + from),
-                            Text("To : " + to),
-                          ],
-                        ),
-                        Text(payment.amount.toString()),
-                      ],
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentUpdate(payment: payment,)));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200]
+                      ),
+                      padding: EdgeInsets.all(15),
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("From : " + from),
+                              Text("To : " + to),
+                            ],
+                          ),
+                          Text(payment.amount.toString()),
+                        ],
+                      ),
                     ),
                   );
                 } else {

@@ -10,10 +10,10 @@ class Trip extends HiveObject {
   final String uuid;
 
   @HiveField(1)
-  final String name;
+   String name;
 
   @HiveField(2)
-  final String currency;
+   String currency;
 
   @HiveField(3,defaultValue: [])
   List<Uint8List> image;

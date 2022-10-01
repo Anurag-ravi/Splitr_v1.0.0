@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.grey,
             primaryColor: Colors.black,
             colorScheme: ColorScheme.light(
-              primary: Color(0xff7ED4CB),
+              primary: Color(0xffFFBA00),
               secondary: Colors.black,
               background: Color(0xfffafafa),
               error: Colors.red,
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.grey,
             primaryColor: Colors.white,
             colorScheme: ColorScheme.dark(
-              primary: Color(0xff7ED4CB),
+              primary: Color(0xffFFBA00),
               secondary: Colors.white,
               background: Color(0xff424242),
               error: Colors.red,
