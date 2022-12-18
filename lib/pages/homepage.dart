@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splitr/components/expensecomponent.dart';
 import 'package:splitr/components/homecomponent.dart';
 import 'package:splitr/components/paymentcomponent.dart';
@@ -28,11 +29,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
   late Trip trip;
   bool hasTrip = false;
   late TabController _tabController;
+  late SharedPreferences prefs;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    inits();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+  void inits() async {
+    prefs = await SharedPreferences.getInstance();
     var trips = Boxes.getTrips().values.toList().cast<Trip>();
     if(trips.length == 0){
       setState(() {
@@ -40,12 +47,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
         trip = Trip(uuid: Uuid().v1(), name: "Trip 1", currency: "INR");
       });
     } else {
+      int idx=0;
+      if(prefs.containsKey('index')){
+        var i = prefs.getInt('index');
+        if(i==trips.length) {
+          idx = 0;
+        } else {
+          idx = i!;
+        }
+      }
       setState(() {
         hasTrip = true;
-        trip = trips[0];
+        trip = trips[idx];
+        currIndex = idx+1;
       });
     }
-    _tabController = TabController(length: 3, vsync: this);
+  }
+  void getprefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
   @override
   Widget build(BuildContext context) {
@@ -167,6 +186,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin  {
                           currIndex = index;
                           trip = tripp;
                         });
+                        prefs.setInt('index', index-1);
                         Navigator.pop(context);
                       },
                       child: Container(
